@@ -20,7 +20,8 @@ use App\Http\Controllers\BookController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $books = \App\Models\Book::all(); // Retrieve all books
+        return view('dashboard', compact('books'));
     })->name('dashboard');
 
     Route::resource('books', BookController::class);

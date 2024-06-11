@@ -43,7 +43,54 @@ class BookController extends Controller
             'image' => $imageName,
         ]);
 
-        return redirect()->route('books.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Book created successfully.');
+    }
+
+    // Show the form for editing the specified book.
+    public function edit($id)
+    {
+        $book = Book::findOrFail($id);
+        return view('books.edit', compact('book'));
+    }
+
+    // Update the specified book in storage.
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'description' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $book = Book::findOrFail($id);
+
+        $imageName = $book->image;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time().'.'.$image->extension();
+            $image->storeAs('public/images', $imageName);
+        }
+
+        $book->update([
+            'title' => $request->title,
+            'author' => $request->author,
+            'description' => $request->description,
+            'image' => $imageName,
+        ]);
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Book updated successfully.');
+    }
+
+    // Remove the specified book from storage.
+    public function destroy($id)
+    {
+        $book = Book::findOrFail($id);
+        $book->delete();
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Book deleted successfully.');
     }
 }
